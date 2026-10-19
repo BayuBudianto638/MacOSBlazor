@@ -1,0 +1,40 @@
+@using MacOSBlazor.Services
+@inject WindowManager WM
+@implements IDisposable
+
+@if (WM.LaunchpadOpen)
+{
+    <div class="mac-launchpad" @onclick="@(() => WM.SetLaunchpad(false))">
+        <label class="lp-search" @onclick:stopPropagation="true">🔍
+            <input placeholder="Search" @bind="query" @bind:event="oninput" />
+        </label>
+        <div class="lp-grid" @onclick:stopPropagation="true">
+            @foreach (var app in WM.Apps.Where(a => a.Name.Contains(query, StringComparison.OrdinalIgnoreCase)))
+            {
+                var a = app;
+                <div class="lp-app" @onclick="@(() => WM.Open(a.Id))">
+                    <div class="lp-icon" style="background:@IconBg(a.Id)">@a.Icon</div>
+                    <div class="lp-name">@a.Name</div>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    private string query = "";
+    protected override void OnInitialized() => WM.Changed += OnChange;
+    private void OnChange() => InvokeAsync(StateHasChanged);
+    public void Dispose() => WM.Changed -= OnChange;
+
+    private static string IconBg(string id) => id switch
+    {
+        "finder" => "linear-gradient(135deg,#5ac8fa,#006aff)",
+        "safari" => "linear-gradient(135deg,#e8f4ff,#a8d8ff)",
+        "messages" => "linear-gradient(135deg,#5df08a,#12b76a)",
+        "calendar" => "linear-gradient(135deg,#ffffff,#e5e5ea)",
+        "preferences" => "linear-gradient(135deg,#8e8e93,#48484a)",
+        "terminal" => "linear-gradient(135deg,#1c1c1e,#000000)",
+        _ => "linear-gradient(135deg,#666,#333)",
+    };
+}

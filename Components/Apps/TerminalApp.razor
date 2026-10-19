@@ -1,0 +1,47 @@
+<div class="term-wrap" @onclick="FocusInput">
+    @foreach (var line in lines)
+    {
+        <div class="t-out">@line</div>
+    }
+    <div class="term-inputrow">
+        <span class="t-prompt">anton@macos:~$</span>
+        <input @ref="inputRef" @bind="current" @bind:event="oninput" @onkeydown="OnKey" spellcheck="false" autocomplete="off" />
+    </div>
+</div>
+
+@code {
+    private ElementReference inputRef;
+    private string current = "";
+    private readonly List<string> lines = ["Welcome to macOS Web Terminal (Blazor). Type 'help'."];
+
+    private async Task FocusInput() { try { await inputRef.FocusAsync(); } catch { } }
+
+    private void OnKey(KeyboardEventArgs e)
+    {
+        if (e.Key != "Enter") return;
+        var cmd = current.Trim();
+        lines.Add($"anton@macos:~$ {cmd}");
+        lines.Add(Run(cmd));
+        current = "";
+    }
+
+    private static string Run(string cmd)
+    {
+        var parts = cmd.Split(' ', 2, StringSplitOptions.RemoveEmptyEntries);
+        return parts.Length == 0 ? "" : parts[0].ToLowerInvariant() switch
+        {
+            "help" => "commands: help, clear, whoami, date, echo <text>, open <finder|safari|calendar|messages>",
+            "clear" => "__CLEAR__",
+            "whoami" => "anton",
+            "date" => DateTime.Now.ToString("ddd MMM dd HH:mm:ss yyyy"),
+            "echo" => parts.Length > 1 ? parts[1] : "",
+            "open" => parts.Length > 1 ? $"opening {parts[1]}... (use the Dock in this demo)" : "usage: open <app>",
+            _ => $"zsh: command not found: {parts[0]}",
+        };
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (lines.Remove("__CLEAR__")) StateHasChanged();
+    }
+}

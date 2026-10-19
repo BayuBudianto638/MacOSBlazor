@@ -1,0 +1,46 @@
+@using MacOSBlazor.Models
+@using MacOSBlazor.Services
+@inject WindowManager WM
+@inject IJSRuntime JS
+
+<div class="mac-window @(Win.IsActive ? "" : "inactive") @(Win.Minimized ? "minimized" : "") @(Win.Maximized ? "maximized" : "") @(Light ? "mac-windowlight" : "")"
+     @onmousedown="@(() => WM.Focus(Win.InstanceId))"
+     style="@Style">
+    <div class="mac-titlebar" @onpointerdown="BeginDrag">
+        <div class="traffic" @onmousedown:stopPropagation="true" @onpointerdown:stopPropagation="true">
+            <button class="t-close" @onclick="@(() => WM.Close(Win.InstanceId))" @onclick:stopPropagation="true" title="Close"></button>
+            <button class="t-min" @onclick="@(() => WM.Minimize(Win.InstanceId))" @onclick:stopPropagation="true" title="Minimize"></button>
+            <button class="t-max" @onclick="@(() => WM.ToggleMaximize(Win.InstanceId))" @onclick:stopPropagation="true" title="Maximize"></button>
+        </div>
+        <div class="win-title">@Win.Title</div>
+        <div style="width:52px"></div>
+    </div>
+    <div class="mac-windowbody">
+        @ChildContent
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public DesktopWindow Win { get; set; } = default!;
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public bool Light { get; set; }
+
+    private DotNetObjectReference<WindowFrame>? _ref;
+
+    private string Style => Win.Maximized
+        ? "left:0;top:26px;right:0;bottom:0;width:auto;height:auto;z-index:" + Win.ZIndex
+        : $"left:{Win.Left}px;top:{Win.Top}px;width:{Win.Width}px;height:{Win.Height}px;z-index:{Win.ZIndex}";
+
+    private async Task BeginDrag(PointerEventArgs e)
+    {
+        if (Win.Maximized) return;
+        _ref ??= DotNetObjectReference.Create(this);
+        await JS.InvokeVoidAsync("macosDrag.start", Win.InstanceId, _ref,
+            e.ClientX, e.ClientY, Win.Left, Win.Top);
+    }
+
+    [JSInvokable]
+    public void OnDragMove(int left, int top) => WM.Move(Win.InstanceId, left, top);
+
+    public void Dispose() => _ref?.Dispose();
+}

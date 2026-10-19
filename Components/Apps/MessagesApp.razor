@@ -1,0 +1,50 @@
+<div class="msg-wrap">
+    <div class="msg-list">
+        @foreach (var t in threads)
+        {
+            var th = t;
+            <div class="msg-thread @(th == active ? "sel" : "")" @onclick="@(() => active = th)">
+                <div class="mt-name">@th.Name</div>
+                <div class="mt-prev">@th.Messages.Last()</div>
+            </div>
+        }
+    </div>
+    <div class="msg-conv">
+        <div class="msg-bubbles">
+            @for (int i = 0; i < active.Messages.Count; i++)
+            {
+                <div class="msg-bubble @(i % 2 == 0 ? "them" : "me")">@active.Messages[i]</div>
+            }
+        </div>
+        <div class="msg-compose">
+            <input placeholder="iMessage" @bind="draft" @onkeydown="OnKey" />
+        </div>
+    </div>
+</div>
+
+@code {
+    private string draft = "";
+    private readonly List<Thread> threads =
+    [
+        new("Bayu", ["Halo Anton! 👋", "Halo juga!"]),
+        new("Tim Design", ["Mockup Big Sur sudah oke", "Siap, lanjut Blazor 🚀"]),
+    ];
+    private Thread active = null!;
+
+    protected override void OnInitialized() => active = threads[0];
+
+    private void OnKey(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && !string.IsNullOrWhiteSpace(draft))
+        {
+            active.Messages.Add(draft.Trim());
+            draft = "";
+        }
+    }
+
+    private sealed class Thread(string name, string[] seed)
+    {
+        public string Name { get; } = name;
+        public List<string> Messages { get; } = [.. seed];
+    }
+}

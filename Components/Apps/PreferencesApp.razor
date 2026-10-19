@@ -1,0 +1,25 @@
+@using MacOSBlazor.Services
+@inject MacSettings Settings
+@implements IDisposable
+
+<div class="pref-wrap">
+    <div class="pref-user">
+        <div class="pu-avatar">🧑‍💻</div>
+        <div><div style="font-weight:700">Anton</div><div style="opacity:.6">Apple ID, iCloud, Media &amp; Purchases</div></div>
+    </div>
+    <h3>Desktop &amp; Menu Bar</h3>
+    <label class="pref-row"><input type="checkbox" checked="@Settings.DynamicWallpaper" @onchange="@(_ => Settings.ToggleDynamicWallpaper())" /> Dynamic wallpaper (day/night, meniru sDynamicWallpaper)</label>
+    <label class="pref-row"><input type="checkbox" checked="@Settings.ForceNight" @onchange="@(_ => Settings.ToggleForceNight())" /> Dark wallpaper selalu</label>
+    <label class="pref-row"><input type="checkbox" checked="@Settings.ShowDateInMenuBar" @onchange="@(_ => Settings.ToggleShowDate())" /> Tampilkan tanggal di menu bar</label>
+    <label class="pref-row"><input type="checkbox" checked="@Settings.ShowSecondsInMenuBar" @onchange="@(_ => Settings.ToggleShowSeconds())" /> Tampilkan detik di menu bar</label>
+    <h3>Dock</h3>
+    <label class="pref-row"><input type="checkbox" checked="@Settings.AnimateDockIconOnOpen" @onchange="@(_ => Settings.ToggleAnimateDockIconOnOpen())" /> Animasikan ikon saat dibuka (bounce)</label>
+    <h3>Battery</h3>
+    <label class="pref-row"><input type="checkbox" checked="@Settings.ShowBatteryPercentage" @onchange="@(_ => Settings.ToggleShowBatteryPercentage())" /> Tampilkan persentase baterai (@Settings.BatteryPercentage%)</label>
+</div>
+
+@code {
+    protected override void OnInitialized() => Settings.Changed += OnChange;
+    private void OnChange() => InvokeAsync(StateHasChanged);
+    public void Dispose() => Settings.Changed -= OnChange;
+}

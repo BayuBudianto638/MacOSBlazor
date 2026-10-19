@@ -1,0 +1,72 @@
+@page "/"
+@using MacOSBlazor.Components
+@using MacOSBlazor.Components.Apps
+@using MacOSBlazor.Services
+@inject WindowManager WM
+@inject MacSettings Settings
+@inject MacClock Clock
+@implements IDisposable
+
+<PageTitle>macOS Web — Blazor</PageTitle>
+
+<div class="mac-desktop" @onclick="@(() => WM.SetMenuPanel(null))">
+    <div class="mac-wallpaper @(Settings.IsNight(Clock.Now) ? "night" : "day")"></div>
+
+    @if (isUnlocked)
+    {
+        <MenuBar OnLock="Relock" />
+
+        @foreach (var win in WM.Windows)
+        {
+            var w = win;
+            <WindowFrame @key="w.InstanceId" Win="w" Light="@(w.AppId is "calendar")">
+                @AppBody(w.AppId)
+            </WindowFrame>
+        }
+
+        <Launchpad />
+        <NotificationCenter />
+        <Dock />
+    }
+    <LockScreen @ref="lockScreen" OnUnlock="OnUnlock" />
+</div>
+
+@code {
+    private LockScreen? lockScreen;
+    private bool isUnlocked;
+
+    protected override void OnInitialized()
+    {
+        WM.Changed += OnChange;
+        Settings.Changed += OnChange;
+        Clock.Tick += OnTick;
+        if (WM.Windows.Count == 0)
+            WM.Open("finder");
+    }
+
+    private RenderFragment AppBody(string appId) => builder =>
+    {
+        switch (appId)
+        {
+            case "finder": builder.OpenComponent<FinderApp>(0); break;
+            case "safari": builder.OpenComponent<SafariApp>(0); break;
+            case "messages": builder.OpenComponent<MessagesApp>(0); break;
+            case "calendar": builder.OpenComponent<CalendarApp>(0); break;
+            case "preferences": builder.OpenComponent<PreferencesApp>(0); break;
+            case "terminal": builder.OpenComponent<TerminalApp>(0); break;
+        }
+        builder.CloseComponent();
+    };
+
+    private void OnChange() => InvokeAsync(StateHasChanged);
+    private void OnTick() => InvokeAsync(StateHasChanged);
+    private void OnUnlock() => isUnlocked = true;
+    private void Relock() { isUnlocked = false; lockScreen?.Lock(); }
+
+    public void Dispose()
+    {
+        WM.Changed -= OnChange;
+        Settings.Changed -= OnChange;
+        Clock.Tick -= OnTick;
+    }
+}

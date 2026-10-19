@@ -1,0 +1,101 @@
+@using MacOSBlazor.Services
+@inject WindowManager WM
+@implements IDisposable
+
+@if (Anchor == "app" && WM.OpenMenuPanel == "app")
+{
+    <div class="mac-panel" @onclick:stopPropagation="true">
+        <div class="panel-row disabled"><span>About @ActiveName</span></div>
+        <div class="panel-sep"></div>
+        <div class="panel-row" @onclick="@(() => Do("prefs"))"><span>Preferences…</span><span class="panel-shortcut">⌘,</span></div>
+        <div class="panel-sep"></div>
+        <div class="panel-row" @onclick="@(() => Do("quit"))"><span>Quit @ActiveName</span><span class="panel-shortcut">⌘Q</span></div>
+    </div>
+}
+@if (Anchor == "file" && WM.OpenMenuPanel == "file")
+{
+    <div class="mac-panel" @onclick:stopPropagation="true">
+        <div class="panel-row" @onclick="@(() => Do("new-finder"))"><span>New Finder Window</span><span class="panel-shortcut">⌘N</span></div>
+        <div class="panel-row disabled"><span>New Folder</span><span class="panel-shortcut">⇧⌘N</span></div>
+        <div class="panel-sep"></div>
+        <div class="panel-row disabled"><span>Open</span><span class="panel-shortcut">⌘O</span></div>
+        <div class="panel-row" @onclick="@(() => Do("close-win"))"><span>Close Window</span><span class="panel-shortcut">⌘W</span></div>
+    </div>
+}
+@if (Anchor == "edit" && WM.OpenMenuPanel == "edit")
+{
+    <div class="mac-panel" @onclick:stopPropagation="true">
+        <div class="panel-row disabled"><span>Undo</span><span class="panel-shortcut">⌘Z</span></div>
+        <div class="panel-row disabled"><span>Redo</span><span class="panel-shortcut">⇧⌘Z</span></div>
+        <div class="panel-sep"></div>
+        <div class="panel-row disabled"><span>Cut</span><span class="panel-shortcut">⌘X</span></div>
+        <div class="panel-row disabled"><span>Copy</span><span class="panel-shortcut">⌘C</span></div>
+        <div class="panel-row disabled"><span>Paste</span><span class="panel-shortcut">⌘V</span></div>
+        <div class="panel-sep"></div>
+        <div class="panel-row disabled"><span>Select All</span><span class="panel-shortcut">⌘A</span></div>
+    </div>
+}
+@if (Anchor == "view" && WM.OpenMenuPanel == "view")
+{
+    <div class="mac-panel" @onclick:stopPropagation="true">
+        <div class="panel-row disabled"><span>as Icons</span><span class="panel-shortcut">⌘1</span></div>
+        <div class="panel-row disabled"><span>as List</span><span class="panel-shortcut">⌘2</span></div>
+        <div class="panel-row disabled"><span>as Columns</span><span class="panel-shortcut">⌘3</span></div>
+        <div class="panel-row disabled"><span>as Gallery</span><span class="panel-shortcut">⌘4</span></div>
+        <div class="panel-sep"></div>
+        <div class="panel-row disabled"><span>Show Sidebar</span><span class="panel-shortcut">⌃⌘S</span></div>
+    </div>
+}
+@if (Anchor == "go" && WM.OpenMenuPanel == "go")
+{
+    <div class="mac-panel" @onclick:stopPropagation="true">
+        <div class="panel-row" @onclick="@(() => Do("go-finder"))"><span>Recents</span><span class="panel-shortcut">⇧⌘O</span></div>
+        <div class="panel-row" @onclick="@(() => Do("go-finder"))"><span>Applications</span><span class="panel-shortcut">⇧⌘A</span></div>
+        <div class="panel-row" @onclick="@(() => Do("go-finder"))"><span>Desktop</span><span class="panel-shortcut">⇧⌘D</span></div>
+        <div class="panel-row" @onclick="@(() => Do("go-finder"))"><span>Documents</span><span class="panel-shortcut">⇧⌘O</span></div>
+        <div class="panel-row" @onclick="@(() => Do("go-finder"))"><span>Downloads</span><span class="panel-shortcut">⌥⌘L</span></div>
+    </div>
+}
+@if (Anchor == "window" && WM.OpenMenuPanel == "window")
+{
+    <div class="mac-panel" @onclick:stopPropagation="true">
+        <div class="panel-row" @onclick="@(() => Do("min"))"><span>Minimize</span><span class="panel-shortcut">⌘M</span></div>
+        <div class="panel-row" @onclick="@(() => Do("zoom"))"><span>Zoom</span></div>
+        <div class="panel-sep"></div>
+        <div class="panel-row" @onclick="@(() => Do("front"))"><span>Bring All to Front</span></div>
+    </div>
+}
+@if (Anchor == "help" && WM.OpenMenuPanel == "help")
+{
+    <div class="mac-panel" @onclick:stopPropagation="true">
+        <div class="panel-row disabled"><span>macOS Help</span><span class="panel-shortcut">⌘?</span></div>
+        <div class="panel-row disabled"><span>@ActiveName Help</span></div>
+    </div>
+}
+
+@code {
+    [Parameter] public string Anchor { get; set; } = "";
+    private string ActiveName =>
+        WM.Apps.Find(a => a.Id == WM.ActiveAppId)?.Name ?? "Finder";
+
+    protected override void OnInitialized() => WM.Changed += OnChange;
+    private void OnChange() => InvokeAsync(StateHasChanged);
+
+    private void Do(string action)
+    {
+        switch (action)
+        {
+            case "prefs": WM.Open("preferences"); break;
+            case "quit": WM.QuitApp(); break;
+            case "new-finder":
+            case "go-finder": WM.Open("finder"); break;
+            case "close-win": WM.CloseActive(); break;
+            case "min": WM.MinimizeActive(); break;
+            case "zoom": WM.ToggleMaximizeActive(); break;
+            case "front": WM.BringAllToFront(); break;
+        }
+        WM.SetMenuPanel(null);
+    }
+
+    public void Dispose() => WM.Changed -= OnChange;
+}

@@ -1,0 +1,36 @@
+<div class="finder-wrap">
+    <div class="finder-side">
+        <div class="fs-head">Favorites</div>
+        @foreach (var f in favs)
+        {
+            var x = f;
+            <div class="fs-item @(sel == x ? "sel" : "")" @onclick="@(() => sel = x)">@x</div>
+        }
+        <div class="fs-head">Locations</div>
+        <div class="fs-item">💻 Macintosh HD</div>
+        <div class="fs-item">☁️ iCloud Drive</div>
+    </div>
+    <div class="finder-main">
+        <div class="finder-grid">
+            @foreach (var file in files)
+            {
+                var fl = file;
+                <div class="finder-file @(picked == fl.Name ? "sel" : "")" @onclick="@(() => picked = fl.Name)" @ondblclick="@(() => picked = fl.Name)">
+                    <div class="ff-icon">@fl.Icon</div>
+                    <div class="ff-name">@fl.Name</div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private string sel = "📁 Recents";
+    private string picked = "";
+    private readonly string[] favs = ["📁 Recents", "📁 Applications", "📁 Desktop", "📁 Documents", "📁 Downloads"];
+    private readonly (string Name, string Icon)[] files =
+    [
+        ("Projects", "📁"), ("Documents", "📁"), ("wallpaper.jpg", "🖼️"),
+        ("notes.txt", "📝"), ("macOS-web", "📁"), ("README.md", "📄"),
+    ];
+}

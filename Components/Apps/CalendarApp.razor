@@ -1,0 +1,34 @@
+<div class="cal-wrap">
+    <div class="cal-head">
+        <button @onclick="@(() => view = view.AddMonths(-1))">‹</button>
+        <div class="cal-title">@view.ToString("MMMM yyyy")</div>
+        <button @onclick="@(() => view = view.AddMonths(1))">›</button>
+    </div>
+    <div class="cal-grid">
+        @foreach (var d in new[] { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" })
+        {
+            <div class="dow">@d</div>
+        }
+        @foreach (var cell in Cells())
+        {
+            <div class="day @(cell.InMonth ? "" : "other") @(cell.Date == DateTime.Today ? "today" : "")">@cell.Date.Day</div>
+        }
+    </div>
+</div>
+
+@code {
+    private DateTime view = new(DateTime.Today.Year, DateTime.Today.Month, 1);
+
+    private IEnumerable<(DateTime Date, bool InMonth)> Cells()
+    {
+        // Monday-first grid like the original datepicker (firstDay: 1)
+        var first = view;
+        int offset = ((int)first.DayOfWeek + 6) % 7;
+        var start = first.AddDays(-offset);
+        for (int i = 0; i < 42; i++)
+        {
+            var d = start.AddDays(i);
+            yield return (d, d.Month == view.Month);
+        }
+    }
+}

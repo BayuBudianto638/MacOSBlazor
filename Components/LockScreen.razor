@@ -1,0 +1,49 @@
+@using MacOSBlazor.Services
+@inject MacClock Clock
+@implements IDisposable
+
+@if (!unlocked || ForceLock)
+{
+    <div class="mac-lock-screen">
+        <div class="mac-lock">
+        <div class="lock-time">@Clock.Now.ToString("HH:mm")</div>
+        <div class="lock-date">@Clock.Now.ToString("dddd, dd MMMM yyyy")</div>
+        <div class="lock-avatar">🧑‍💻</div>
+        <div class="lock-name">Anton</div>
+        <input type="password" placeholder="Enter Password" @bind="password"
+               @bind:event="oninput" @onkeydown="OnKey" autocomplete="off" />
+        <div class="lock-hint">Ketik password apa saja lalu tekan Enter</div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool ForceLock { get; set; }
+    [Parameter] public EventCallback OnUnlock { get; set; }
+
+    private bool unlocked;
+    private string password = "";
+
+    protected override void OnInitialized() => Clock.Tick += OnTick;
+
+    private void OnTick() => InvokeAsync(StateHasChanged);
+
+    private async Task OnKey(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && !string.IsNullOrWhiteSpace(password))
+        {
+            unlocked = true;
+            password = "";
+            await OnUnlock.InvokeAsync();
+        }
+    }
+
+    public void Lock()
+    {
+        unlocked = false;
+        StateHasChanged();
+    }
+
+    public void Dispose() => Clock.Tick -= OnTick;
+}
+

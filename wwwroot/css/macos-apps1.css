@@ -1,0 +1,37 @@
+.mac-lock-screen { position: fixed; inset: 0; z-index: 30000; display: flex; align-items: center; justify-content: center;
+  background:
+    radial-gradient(ellipse 90% 60% at 70% 20%, #4c1d95 0%, transparent 55%),
+    radial-gradient(ellipse 80% 70% at 20% 80%, #0c4a6e 0%, transparent 55%),
+    radial-gradient(ellipse 70% 55% at 85% 85%, #9d174d 0%, transparent 55%),
+    linear-gradient(135deg, #0f172a 0%, #1e1b4b 45%, #4a044e 75%, #0b1120 100%);
+  background-size: cover; }
+.mac-lock { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; color: #fff; }
+.mac-lock .lock-avatar { width: 96px; height: 96px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2);
+  display: flex; align-items: center; justify-content: center; font-size: 44px; }
+.mac-lock .lock-name { font-size: 22px; font-weight: 600; text-shadow: 0 2px 8px rgba(0,0,0,.5); }
+.mac-lock input { background: rgba(255,255,255,.22); border: none; outline: none; border-radius: 18px; padding: 8px 18px; width: 220px; text-align: center; color: #fff; font-size: 14px; }
+.mac-lock input::placeholder { color: rgba(255,255,255,.75); }
+.mac-lock .lock-hint { font-size: 12px; opacity: .7; }
+.mac-lock .lock-time { font-size: 64px; font-weight: 700; text-shadow: 0 2px 12px rgba(0,0,0,.5); }
+.mac-lock .lock-date { font-size: 18px; text-shadow: 0 1px 6px rgba(0,0,0,.5); }
+
+.mac-notif { position: absolute; top: 30px; right: 10px; bottom: 60px; width: 340px; z-index: 10001;
+  background: rgba(35,35,38,.78); backdrop-filter: var(--mac-blur); -webkit-backdrop-filter: var(--mac-blur);
+  border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,.5), inset 0 0 0 1px rgba(255,255,255,.12);
+  color: #fff; padding: 18px; overflow-y: auto; }
+.mac-notif .notif-date { font-size: 20px; font-weight: 700; margin-bottom: 14px; }
+.mac-notif .notif-card { background: rgba(255,255,255,.1); border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; font-size: 13px; }
+.mac-notif .notif-card .nc-title { font-weight: 700; margin-bottom: 2px; }
+
+.finder-wrap { display: flex; height: 100%; font-size: 13px; }
+.finder-side { width: 170px; flex: none; background: rgba(255,255,255,.06); padding: 10px; display: flex; flex-direction: column; gap: 2px; }
+.finder-side .fs-head { font-size: 11px; font-weight: 700; opacity: .55; margin: 8px 6px 2px; }
+.finder-side .fs-item { padding: 4px 8px; border-radius: 6px; cursor: default; }
+.finder-side .fs-item.sel, .finder-side .fs-item:hover { background: rgba(255,255,255,.14); }
+.finder-main { flex: 1; padding: 12px; }
+.finder-grid { display: flex; flex-wrap: wrap; gap: 14px; }
+.finder-file { width: 84px; text-align: center; padding: 8px 4px; border-radius: 8px; }
+.finder-file:hover { background: rgba(255,255,255,.08); }
+.finder-file.sel { background: rgba(0,106,255,.35); }
+.finder-file .ff-icon { font-size: 38px; }
+.finder-file .ff-name { font-size: 12px; margin-top: 4px; word-break: break-word; }

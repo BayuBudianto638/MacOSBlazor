@@ -1,0 +1,52 @@
+<div class="safari-tabs">
+    @foreach (var t in tabs)
+    {
+        var tab = t;
+        <div class="stab @(tab == active ? "active" : "")" @onclick="@(() => active = tab)">@tab</div>
+    }
+    <div class="stab" @onclick="NewTab">＋</div>
+</div>
+<div class="safari-bar">
+    <span>‹</span><span>›</span>
+    <input @bind="url" @onkeydown="OnKey" />
+</div>
+<div class="safari-page">
+    @if (active == "Favorites")
+    {
+        <h2>Favorites</h2>
+        <div class="safari-favs">
+            <div class="safari-fav"><div class="fav-icon">▶️</div>Youtube</div>
+            <div class="safari-fav"><div class="fav-icon">🎬</div>Netflix</div>
+            <div class="safari-fav"><div class="fav-icon">💾</div>Drive</div>
+            <div class="safari-fav"><div class="fav-icon">🖊️</div>Codepen</div>
+        </div>
+    }
+    else
+    {
+        <h2>@url</h2>
+        <p style="opacity:.6">Halaman tiruan — meniru tab "index.html" pada repo asli.</p>
+        <p>Sample text</p>
+    }
+</div>
+
+@code {
+    private readonly List<string> tabs = ["index.html", "Favorites"];
+    private string active = "index.html";
+    private string url = "unsplash.com";
+
+    private void NewTab()
+    {
+        var name = $"Tab {tabs.Count + 1}";
+        tabs.Add(name);
+        active = name;
+    }
+
+    private void OnKey(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && !string.IsNullOrWhiteSpace(url))
+        {
+            if (!tabs.Contains(url)) tabs.Add(url);
+            active = url;
+        }
+    }
+}

@@ -1,0 +1,38 @@
+@using MacOSBlazor.Services
+@inject WindowManager WM
+@inject MacClock Clock
+@implements IDisposable
+
+@if (WM.NotificationCenterOpen)
+{
+    <div class="mac-notif">
+        <div class="notif-date">@Clock.Now.ToString("dddd,")<br />@Clock.Now.ToString("MMMM dd")</div>
+        <div class="notif-card">
+            <div class="nc-title">🕘 @Clock.Now.ToString("HH:mm")</div>
+            <div>Selamat datang di macOS Web versi Blazor, Anton.</div>
+        </div>
+        <div class="notif-card">
+            <div class="nc-title">📅 Calendar</div>
+            <div>Tidak ada jadwal hari ini. Nikmati harimu!</div>
+        </div>
+        <div class="notif-card">
+            <div class="nc-title">🔋 Battery</div>
+            <div>Baterai 74%. Hemat energi aktif.</div>
+        </div>
+    </div>
+}
+
+@code {
+    protected override void OnInitialized()
+    {
+        WM.Changed += OnChange;
+        Clock.Tick += OnTick;
+    }
+    private void OnChange() => InvokeAsync(StateHasChanged);
+    private void OnTick() => InvokeAsync(StateHasChanged);
+    public void Dispose()
+    {
+        WM.Changed -= OnChange;
+        Clock.Tick -= OnTick;
+    }
+}

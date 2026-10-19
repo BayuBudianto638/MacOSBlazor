@@ -1,0 +1,133 @@
+@using MacOSBlazor.Services
+@inject WindowManager WM
+@inject MacSettings Settings
+@inject MacClock Clock
+@implements IDisposable
+
+<div class="mac-menubar" @onmousedown="@(() => {})">
+    <div class="mb-group">
+        <div class="mb-anchor">
+            <div class="mb-item mb-logo @(WM.OpenMenuPanel == "apple" ? "active" : "")"
+                 @onclick="@(() => WM.SetMenuPanel(WM.OpenMenuPanel == "apple" ? null : "apple"))" @onclick:stopPropagation="true">🍎</div>
+        </div>
+        <div class="mb-anchor">
+            <div class="mb-item bold @(WM.OpenMenuPanel == "app" ? "active" : "")"
+                 @onclick="@(() => WM.SetMenuPanel(WM.OpenMenuPanel == "app" ? null : "app"))" @onclick:stopPropagation="true">@ActiveName</div>
+            <AppMenuPanels Anchor="app" />
+        </div>
+        <div class="mb-anchor">
+            <div class="mb-item @(WM.OpenMenuPanel == "file" ? "active" : "")"
+                 @onclick="@(() => WM.SetMenuPanel(WM.OpenMenuPanel == "file" ? null : "file"))" @onclick:stopPropagation="true">File</div>
+            <AppMenuPanels Anchor="file" />
+        </div>
+        <div class="mb-anchor">
+            <div class="mb-item @(WM.OpenMenuPanel == "edit" ? "active" : "")"
+                 @onclick="@(() => WM.SetMenuPanel(WM.OpenMenuPanel == "edit" ? null : "edit"))" @onclick:stopPropagation="true">Edit</div>
+            <AppMenuPanels Anchor="edit" />
+        </div>
+        <div class="mb-anchor">
+            <div class="mb-item @(WM.OpenMenuPanel == "view" ? "active" : "")"
+                 @onclick="@(() => WM.SetMenuPanel(WM.OpenMenuPanel == "view" ? null : "view"))" @onclick:stopPropagation="true">View</div>
+            <AppMenuPanels Anchor="view" />
+        </div>
+        <div class="mb-anchor">
+            <div class="mb-item @(WM.OpenMenuPanel == "go" ? "active" : "")"
+                 @onclick="@(() => WM.SetMenuPanel(WM.OpenMenuPanel == "go" ? null : "go"))" @onclick:stopPropagation="true">Go</div>
+            <AppMenuPanels Anchor="go" />
+        </div>
+        <div class="mb-anchor">
+            <div class="mb-item @(WM.OpenMenuPanel == "window" ? "active" : "")"
+                 @onclick="@(() => WM.SetMenuPanel(WM.OpenMenuPanel == "window" ? null : "window"))" @onclick:stopPropagation="true">Window</div>
+            <AppMenuPanels Anchor="window" />
+        </div>
+        <div class="mb-anchor">
+            <div class="mb-item @(WM.OpenMenuPanel == "help" ? "active" : "")"
+                 @onclick="@(() => WM.SetMenuPanel(WM.OpenMenuPanel == "help" ? null : "help"))" @onclick:stopPropagation="true">Help</div>
+            <AppMenuPanels Anchor="help" />
+        </div>
+    </div>
+    <div class="mb-group">
+        <div class="mb-anchor">
+            <div class="mb-item" title="Bluetooth">🔵</div>
+        </div>
+        <div class="mb-anchor anchor-right">
+            <div class="mb-item" @onclick="@(() => WM.SetMenuPanel(WM.OpenMenuPanel == "power" ? null : "power"))" @onclick:stopPropagation="true">
+                🔋 @(Settings.ShowBatteryPercentage ? Settings.BatteryPercentage + "%" : "")
+            </div>
+            @if (WM.OpenMenuPanel == "power")
+            {
+                <div class="mac-panel" @onclick:stopPropagation="true">
+                    <div class="panel-row disabled"><span>Battery</span><span>@Settings.BatteryPercentage%</span></div>
+                    <div class="panel-sep"></div>
+                    <div class="panel-row" @onclick="@(() => { Settings.ToggleShowBatteryPercentage(); WM.SetMenuPanel(null); })">
+                        <span>Show Percentage</span><span>@(Settings.ShowBatteryPercentage ? "✓" : "")</span>
+                    </div>
+                    <div class="panel-row" @onclick="@(() => { Settings.ToggleForceNight(); WM.SetMenuPanel(null); })">
+                        <span>Dark Wallpaper</span><span>@(Settings.ForceNight ? "✓" : "")</span>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="mb-anchor anchor-right">
+            <div class="mb-item @(WM.OpenMenuPanel == "time" ? "active" : "")"
+                 @onclick="@(() => WM.SetMenuPanel(WM.OpenMenuPanel == "time" ? null : "time"))" @onclick:stopPropagation="true">
+                @Clock.MenuBarText(Settings)
+            </div>
+            @if (WM.OpenMenuPanel == "time")
+            {
+                <div class="mac-panel" @onclick:stopPropagation="true">
+                    <div class="panel-row disabled"><span>@Clock.Now.ToString("dddd, dd MMMM yyyy")</span></div>
+                    <div class="panel-sep"></div>
+                    <div class="panel-row" @onclick="@(() => { Settings.ToggleShowDate(); WM.SetMenuPanel(null); })">
+                        <span>Show Date</span><span>@(Settings.ShowDateInMenuBar ? "✓" : "")</span>
+                    </div>
+                    <div class="panel-row" @onclick="@(() => { Settings.ToggleShowSeconds(); WM.SetMenuPanel(null); })">
+                        <span>Show Seconds</span><span>@(Settings.ShowSecondsInMenuBar ? "✓" : "")</span>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="mb-anchor">
+            <div class="mb-item" @onclick="@(() => WM.SetNotificationCenter(!WM.NotificationCenterOpen))" @onclick:stopPropagation="true">📅</div>
+        </div>
+    </div>
+</div>
+
+<div style="position:absolute;top:30px;left:8px;z-index:10001">
+@if (WM.OpenMenuPanel == "apple")
+{
+    <div class="mac-panel" style="position:static" @onclick:stopPropagation="true">
+        <div class="panel-row disabled">About This Mac</div>
+        <div class="panel-sep"></div>
+        <div class="panel-row" @onclick="@(() => { WM.Open("preferences"); WM.SetMenuPanel(null); })">System Preferences…</div>
+        <div class="panel-row disabled">App Store…</div>
+        <div class="panel-sep"></div>
+        <div class="panel-row" @onclick="LockScreen">Lock Screen</div>
+    </div>
+}
+</div>
+
+@code {
+    [Parameter] public EventCallback OnLock { get; set; }
+
+    private string ActiveName =>
+        WM.Apps.Find(a => a.Id == WM.ActiveAppId)?.Name ?? "Finder";
+
+    protected override void OnInitialized()
+    {
+        WM.Changed += OnChange;
+        Settings.Changed += OnChange;
+        Clock.Tick += OnTick;
+    }
+
+    private void OnChange() => InvokeAsync(StateHasChanged);
+    private void OnTick() => InvokeAsync(StateHasChanged);
+    private async Task LockScreen() { WM.SetMenuPanel(null); await OnLock.InvokeAsync(); }
+
+    public void Dispose()
+    {
+        WM.Changed -= OnChange;
+        Settings.Changed -= OnChange;
+        Clock.Tick -= OnTick;
+    }
+}

@@ -1,0 +1,60 @@
+/* macOS-web clone - design tokens ported from RedEdge967/macOS-web style.scss */
+:root {
+  --mac-blue: #006aff;
+  --mac-green: #1ff042;
+  --mac-window-bg: rgb(30, 30, 31);
+  --mac-taskbar-bg: rgba(50, 50, 50, .5);
+  --mac-blur: blur(30px) saturate(1.5);
+  --mac-font: "Segoe UI", "Roboto", -apple-system, sans-serif;
+}
+
+html, body, #app {
+  margin: 0; padding: 0; width: 100vw; height: 100vh; overflow: hidden;
+  background: #000; font-family: var(--mac-font); user-select: none;
+}
+
+.mac-desktop { position: fixed; inset: 0; overflow: hidden; }
+.mac-wallpaper { position: absolute; inset: 0; background-size: cover; transition: opacity .4s ease; }
+.mac-wallpaper.day {
+  background:
+    radial-gradient(ellipse 90% 60% at 70% 20%, #ff9a8b 0%, transparent 55%),
+    radial-gradient(ellipse 80% 70% at 20% 80%, #5ee7df 0%, transparent 55%),
+    radial-gradient(ellipse 70% 55% at 85% 85%, #a855f7 0%, transparent 55%),
+    linear-gradient(135deg, #f6d365 0%, #fda085 30%, #a18cd1 60%, #355c9e 100%);
+}
+.mac-wallpaper.night {
+  background:
+    radial-gradient(ellipse 90% 60% at 70% 20%, #4c1d95 0%, transparent 55%),
+    radial-gradient(ellipse 80% 70% at 20% 80%, #0c4a6e 0%, transparent 55%),
+    radial-gradient(ellipse 70% 55% at 85% 85%, #9d174d 0%, transparent 55%),
+    linear-gradient(135deg, #0f172a 0%, #1e1b4b 45%, #4a044e 75%, #0b1120 100%);
+}
+
+.mac-menubar {
+  position: absolute; top: 0; left: 0; right: 0; height: 26px; z-index: 10000;
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--mac-taskbar-bg); backdrop-filter: var(--mac-blur) brightness(.8);
+  -webkit-backdrop-filter: var(--mac-blur) brightness(.8);
+  box-shadow: 0 1px 0 rgba(0,0,0,.5); color: #fff; font-size: 13px; padding: 0 12px;
+}
+.mac-menubar .mb-group { display: flex; align-items: center; height: 100%; }
+.mac-menubar .mb-item { padding: 0 10px; height: 100%; display: flex; align-items: center; cursor: default; }
+.mac-menubar .mb-item.active, .mac-menubar .mb-item:active { background: var(--mac-blue); }
+.mac-menubar .mb-item.bold { font-weight: 700; }
+.mac-menubar .mb-logo { font-size: 15px; padding: 0 12px; }
+
+.mac-panel {
+  position: absolute; top: 30px; z-index: 10001; min-width: 230px;
+  background: rgba(40, 40, 42, .72); backdrop-filter: var(--mac-blur) brightness(.7);
+  -webkit-backdrop-filter: var(--mac-blur) brightness(.7);
+  border-radius: 8px; box-shadow: 0 12px 40px rgba(0,0,0,.5), inset 0 0 0 1px rgba(255,255,255,.12);
+  color: #fff; font-size: 13px; padding: 6px; overflow: hidden;
+}
+.mac-panel .panel-row { padding: 5px 12px; border-radius: 5px; cursor: default; display: flex; justify-content: space-between; gap: 24px; }
+.mac-panel .panel-row:hover { background: var(--mac-blue); }
+.mac-panel .panel-row.disabled { opacity: .45; }
+.mac-panel .panel-sep { height: 1px; background: rgba(255,255,255,.15); margin: 5px 8px; }
+.mac-panel .panel-shortcut { opacity: .6; }
+.mac-menubar .mb-anchor { position: relative; height: 100%; display: flex; align-items: stretch; }
+.mb-anchor .mac-panel { top: calc(100% + 4px); left: 0; }
+.mb-anchor.anchor-right .mac-panel { left: auto; right: 0; }

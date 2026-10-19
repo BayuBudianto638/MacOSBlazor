@@ -1,0 +1,62 @@
+@using MacOSBlazor.Services
+@inject WindowManager WM
+@inject MacSettings Settings
+@implements IDisposable
+
+@{
+    var bouncing = bounceApp;
+}
+
+<div class="mac-dock @(Settings.AnimateDockIconOnOpen ? "animate" : "")">
+    <div class="dock-app" @onclick="@(() => WM.SetLaunchpad(true))" title="Launchpad">
+        <span class="tip">Launchpad</span>
+        <div class="dock-icon" style="background:linear-gradient(135deg,#3a3a3c,#1c1c1e)">🚀</div>
+    </div>
+    @foreach (var app in WM.Apps)
+    {
+        var a = app;
+        var open = WM.Windows.Exists(w => w.AppId == a.Id);
+        <div class="dock-app @(open ? "open" : "") @(bouncing == a.Id ? "bounce" : "")"
+             @onclick="@(() => OpenApp(a.Id))" title="@a.Name">
+            <span class="tip">@a.Name</span>
+            <div class="dock-icon" style="background:@IconBg(a.Id)">@a.Icon</div>
+        </div>
+        @if (a.Id == "calendar")
+        {
+            <div class="dock-sep"></div>
+        }
+    }
+</div>
+
+@code {
+    private string? bounceApp;
+
+    protected override void OnInitialized() => WM.Changed += OnChange;
+    private void OnChange() => InvokeAsync(StateHasChanged);
+
+    private async Task OpenApp(string id)
+    {
+        WM.Open(id);
+        if (Settings.AnimateDockIconOnOpen)
+        {
+            bounceApp = id;
+            StateHasChanged();
+            await Task.Delay(850);
+            bounceApp = null;
+            StateHasChanged();
+        }
+    }
+
+    private static string IconBg(string id) => id switch
+    {
+        "finder" => "linear-gradient(135deg,#5ac8fa,#006aff)",
+        "safari" => "linear-gradient(135deg,#e8f4ff,#a8d8ff)",
+        "messages" => "linear-gradient(135deg,#5df08a,#12b76a)",
+        "calendar" => "linear-gradient(135deg,#ffffff,#e5e5ea)",
+        "preferences" => "linear-gradient(135deg,#8e8e93,#48484a)",
+        "terminal" => "linear-gradient(135deg,#1c1c1e,#000000)",
+        _ => "linear-gradient(135deg,#666,#333)",
+    };
+
+    public void Dispose() => WM.Changed -= OnChange;
+}
